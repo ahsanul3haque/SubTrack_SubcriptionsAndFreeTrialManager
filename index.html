@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SubTrack — Subscription & Free Trial Manager</title>
+  <meta name="description" content="SubTrack helps you manage recurring digital subscriptions, track free trials, and analyze your spending. CSE311L Group 10.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="authScreen">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-icon">📊</div>
+      <div class="auth-logo-text">SubTrack</div>
+      <span style="font-size:11px;color:var(--text-3);margin-left:4px">v1.0</span>
+    </div>
+
+    <!-- ── LOGIN FORM ─────────────────────────── -->
+    <div id="loginView">
+      <div class="auth-title">Sign in to SubTrack</div>
+      <div class="auth-subtitle">Manage your subscriptions and free trials in one place.</div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input id="loginEmail" type="email" class="form-input" placeholder="you@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input id="loginPass" type="password" class="form-input" placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="handleLogin()" style="margin-top:4px">Sign In →</button>
+
+      <div class="demo-hint">
+        🔑 <strong>Demo accounts available.</strong> Use any email below with password <strong>demo123</strong><br>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;display:block;margin-top:6px;line-height:1.8">
+          ahsanul@student.nsu.edu<br>
+          erisha@student.nsu.edu<br>
+          john.doe@email.com
+        </span>
+      </div>
+
+      <div class="auth-switch" style="margin-top:20px">
+        Don't have an account? <a onclick="document.getElementById('loginView').classList.add('hidden');document.getElementById('registerView').classList.remove('hidden')">Create one</a>
+      </div>
+    </div>
+
+    <!-- ── REGISTER FORM ──────────────────────── -->
+    <div id="registerView" class="hidden">
+      <div class="auth-title">Create Account</div>
+      <div class="auth-subtitle">Join SubTrack and start managing your subscriptions.</div>
+
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input id="regName" type="text" class="form-input" placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input id="regEmail" type="email" class="form-input" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input id="regPass" type="password" class="form-input" placeholder="At least 6 characters">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input id="regPass2" type="password" class="form-input" placeholder="Repeat your password">
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="handleRegister()" style="margin-top:4px">Create Account →</button>
+
+      <div class="auth-switch" style="margin-top:20px">
+        Already have an account? <a onclick="document.getElementById('registerView').classList.add('hidden');document.getElementById('loginView').classList.remove('hidden')">Sign in</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════════════════════════ -->
+<div id="appScreen" class="hidden" style="display:flex">
+
+  <!-- ── SIDEBAR ───────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📊</div>
+      <div class="logo-text">SubTrack</div>
+      <span class="logo-badge">BETA</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Main</span>
+
+      <div class="nav-item active" data-view="dashboard" onclick="Router.go('dashboard')">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </div>
+
+      <div class="nav-item" data-view="subscriptions" onclick="Router.go('subscriptions')">
+        <span class="nav-icon">📦</span>
+        <span>My Subscriptions</span>
+      </div>
+
+      <div class="nav-item" data-view="trials" onclick="Router.go('trials')">
+        <span class="nav-icon">⏰</span>
+        <span>Free Trials</span>
+        <span id="trialBadge" class="nav-badge hide">0</span>
+      </div>
+
+      <span class="nav-section-label" style="margin-top:8px">Insights</span>
+
+      <div class="nav-item" data-view="analytics" onclick="Router.go('analytics')">
+        <span class="nav-icon">📊</span>
+        <span>Analytics</span>
+      </div>
+
+      <span class="nav-section-label" style="margin-top:8px">Explore</span>
+
+      <div class="nav-item" data-view="catalog" onclick="Router.go('catalog')">
+        <span class="nav-icon">🛍️</span>
+        <span>Service Catalog</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-pill">
+        <div class="avatar" id="sidebarAvatar">A</div>
+        <div class="user-info">
+          <div class="user-name"  id="sidebarUserName">Loading...</div>
+          <div class="user-email" id="sidebarUserEmail">...</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="handleLogout()" style="margin-top:8px">
+        🚪 Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+  <div class="app-main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-sub">CSE311L — Group 10 | Section 06 | North South University</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <button class="btn btn-primary btn-sm" onclick="Views._addSub?.()">＋ Add Subscription</button>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="page-content">
+
+      <!-- Dashboard View -->
+      <div id="view-dashboard" class="view">
+        <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading dashboard...</div></div>
+      </div>
+
+      <!-- Subscriptions View -->
+      <div id="view-subscriptions" class="view hidden">
+        <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading...</div></div>
+      </div>
+
+      <!-- Free Trials View -->
+      <div id="view-trials" class="view hidden">
+        <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading...</div></div>
+      </div>
+
+      <!-- Analytics View -->
+      <div id="view-analytics" class="view hidden">
+        <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading...</div></div>
+      </div>
+
+      <!-- Catalog View -->
+      <div id="view-catalog" class="view hidden">
+        <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading...</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL
+══════════════════════════════════════════════════════════════ -->
+<div id="modalOverlay" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Modal</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     TOAST NOTIFICATIONS
+══════════════════════════════════════════════════════════════ -->
+<div id="toastContainer"></div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     APP SCRIPT
+══════════════════════════════════════════════════════════════ -->
+<script src="js/app.js"></script>
+
+</body>
+</html>
