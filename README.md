@@ -1,4 +1,4 @@
-# SubTrack---Subcriptions-And-Free-Trial-Manager
+# SubTrack - Subcriptions And Free Trial Manager
 A full-stack web application built with JS, PHP, and MySQL designed to track software subscriptions, manage free trials, and visualize weekly, monthly or yearly expenses. Built for CSE311L (Database Systems Lab) at North South University.
 
 ## ✨ Features
