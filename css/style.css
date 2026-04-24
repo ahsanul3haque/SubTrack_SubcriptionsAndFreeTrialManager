@@ -667,3 +667,35 @@ select.form-input option { background: var(--card); }
   .catalog-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
 }
+/* ── LIGHT MODE OVERRIDES ── */
+:root[data-theme="light"], 
+html[data-theme="light"] {
+  --bg: #F8FAFC !important;
+  --card: #FFFFFF !important;
+  --card-2: #F1F5F9 !important;
+  --text: #0F172A !important;
+  --text-2: #64748B !important;
+  --text-3: #94A3B8 !important;
+  --border: #E2E8F0 !important;
+  --border-2: #CBD5E1 !important;
+  --danger-g: #FEE2E2 !important;
+}
+
+/* Bulletproof safety net to force the background to change */
+html[data-theme="light"] body {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="light"] .card, 
+html[data-theme="light"] .auth-card,
+html[data-theme="light"] .sidebar,
+html[data-theme="light"] .topbar,
+html[data-theme="light"] .modal {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+}
+
+html[data-theme="light"] .auth-card {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+}

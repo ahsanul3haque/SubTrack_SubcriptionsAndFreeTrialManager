@@ -1,5 +1,5 @@
 /* ================================================================
-   SubTrack — app.js (Flawless UX & Corrected Time Anchors)
+   SubTrack — app.js (Full Suite + Dark/Light Theme Support)
    CSE311L — Group 10 | Section 06 | North South University
    ================================================================ */
 
@@ -64,6 +64,21 @@ const DB = {
       }
     } catch(e) { console.error("Login Error:", e); }
     return null;
+  },
+
+  async register(name, email, password) {
+    const res = await fetch(this.API_URL + '?action=register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const user = { id: parseInt(data.user.UserID), name: data.user.Name, email: data.user.Email };
+      localStorage.setItem(this.KEYS.session, JSON.stringify(user));
+      return user;
+    } else {
+      throw new Error(data.error_message);
+    }
   },
 
   getCurrentUser() { 
@@ -232,6 +247,19 @@ function statusBadge(sub) {
   if (sub.status === 'Canceled') return `<span class="badge badge-canceled">Canceled</span>`;
   if (sub.status === 'Expired')  return `<span class="badge badge-expired">Expired</span>`;
   return `<span class="badge">${sub.status}</span>`;
+}
+
+// ── NEW: THEME TOGGLE LOGIC ──
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  const newTheme = isLight ? 'dark' : 'light';
+  
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('st_theme', newTheme); // Save to browser memory
+  
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = newTheme === 'light' ? '🌙' : '☀️';
 }
 
 // ── ROUTER ─────────────────────────────────────────────────────
@@ -418,11 +446,9 @@ const Views = {
     `;
   },
 
-  // ── NEW: BEAUTIFUL MODALS AND CORRECTED TIME ANCHORS ──
   _promptRenewal(id, cycle) {
-    const todayStr = new Date().toISOString().split('T')[0]; // Anchor logic entirely to TODAY
+    const todayStr = new Date().toISOString().split('T')[0]; 
     const newDateStr = DB.calculateNextDate(todayStr, cycle);
-    
     const promptMsg = `<p>Log a payment today and push the next billing date forward to <b>${newDateStr}</b>?</p>`;
     openModal('Renew Subscription', promptMsg, `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="Views._executeRenewal(${id}, '${newDateStr}')">Confirm Renewal</button>`);
   },
@@ -738,6 +764,32 @@ async function handleLogin() {
   } else { toast('Invalid email or password.', 'error'); }
 }
 
+async function handleRegister() {
+  const name = document.getElementById('regName')?.value.trim();
+  const email = document.getElementById('regEmail')?.value.trim();
+  const pass  = document.getElementById('regPass')?.value;
+  const pass2 = document.getElementById('regPass2')?.value; 
+  
+  if (!name || !email || !pass || !pass2) { 
+      toast('Please fill in all fields.', 'error'); 
+      return; 
+  }
+  
+  if (pass !== pass2) {
+      toast('Passwords do not match!', 'error');
+      return;
+  }
+  
+  try {
+    const user = await DB.register(name, email, pass);
+    if (user) {
+      await DB.fetchSubsFromDB();
+      toast(`Welcome, ${user.name.split(' ')[0]}! Account created.`, 'success');
+      showApp(); renderSidebar(); Router.go('dashboard');
+    }
+  } catch(e) { toast(e.message, 'error'); }
+}
+
 function renderSidebar() {
   const user   = DB.getCurrentUser();
   const trials = DB.getActiveTrials(user.id).length;
@@ -749,11 +801,20 @@ function renderSidebar() {
 
 function handleLogout() {
   DB.logout(); toast('Logged out successfully.', 'info');
-  showAuth(); document.getElementById('loginEmail').value = ''; document.getElementById('loginPass').value = '';
+  showAuth(); 
+  if(document.getElementById('loginEmail')) document.getElementById('loginEmail').value = ''; 
+  if(document.getElementById('loginPass')) document.getElementById('loginPass').value = '';
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   DB.init();
+  
+  // ── NEW: INITIALIZE SAVED THEME ──
+  const savedTheme = localStorage.getItem('st_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  const themeBtn = document.getElementById('themeToggle');
+  if (themeBtn) themeBtn.textContent = savedTheme === 'light' ? '🌙' : '☀️';
+
   const user = DB.getCurrentUser();
   if (user) { 
     await DB.fetchSubsFromDB();
@@ -761,5 +822,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else { showAuth(); }
 
   document.getElementById('loginPass')?.addEventListener('keydown', e => { if (e.key==='Enter') handleLogin(); });
+  document.getElementById('regPass')?.addEventListener('keydown', e => { if (e.key==='Enter') handleRegister(); });
+  
   document.getElementById('modalOverlay')?.addEventListener('click', e => { if (e.target.id==='modalOverlay') closeModal(); });
 });
