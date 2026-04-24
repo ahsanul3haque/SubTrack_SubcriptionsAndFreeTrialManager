@@ -10,23 +10,62 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
+<style>
+    /* ── LIGHT MODE FORCED OVERRIDES ── */
+    html[data-theme="light"], 
+    :root[data-theme="light"] {
+      --bg: #F8FAFC !important;
+      --card: #FFFFFF !important;
+      --card-2: #F1F5F9 !important;
+      --text: #0F172A !important;
+      --text-2: #64748B !important;
+      --text-3: #94A3B8 !important;
+      --border: #E2E8F0 !important;
+      --border-2: #CBD5E1 !important;
+      --danger-g: #FEE2E2 !important;
+    }
+
+    html[data-theme="light"] body {
+      background-color: #F8FAFC !important;
+      color: #0F172A !important;
+    }
+
+    html[data-theme="light"] .card, 
+    html[data-theme="light"] .auth-card,
+    html[data-theme="light"] .sidebar,
+    html[data-theme="light"] .topbar,
+    html[data-theme="light"] .modal,
+    html[data-theme="light"] .catalog-card,
+    html[data-theme="light"] .trial-card {
+      background-color: #FFFFFF !important;
+      border-color: #E2E8F0 !important;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
+    }
+
+    html[data-theme="light"] .form-input,
+    html[data-theme="light"] .search-input {
+      background-color: #F1F5F9 !important;
+      border-color: #CBD5E1 !important;
+      color: #0F172A !important;
+    }
+
+    html[data-theme="light"] .data-table th,
+    html[data-theme="light"] .data-table td {
+      border-bottom-color: #E2E8F0 !important;
+    }
+  </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════════════
-     AUTH SCREEN
-══════════════════════════════════════════════════════════════ -->
 <div id="authScreen">
   <div class="auth-card">
 
-    <!-- Logo -->
     <div class="auth-logo">
       <div class="auth-logo-icon">📊</div>
       <div class="auth-logo-text">SubTrack</div>
       <span style="font-size:11px;color:var(--text-3);margin-left:4px">v1.0</span>
     </div>
 
-    <!-- ── LOGIN FORM ─────────────────────────── -->
     <div id="loginView">
       <div class="auth-title">Sign in to SubTrack</div>
       <div class="auth-subtitle">Manage your subscriptions and free trials in one place.</div>
@@ -56,7 +95,6 @@
       </div>
     </div>
 
-    <!-- ── REGISTER FORM ──────────────────────── -->
     <div id="registerView" class="hidden">
       <div class="auth-title">Create Account</div>
       <div class="auth-subtitle">Join SubTrack and start managing your subscriptions.</div>
@@ -89,12 +127,8 @@
 </div>
 
 
-<!-- ══════════════════════════════════════════════════════════════
-     MAIN APP
-══════════════════════════════════════════════════════════════ -->
 <div id="appScreen" class="hidden" style="display:flex">
 
-  <!-- ── SIDEBAR ───────────────────────────────────────────── -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">📊</div>
@@ -144,16 +178,19 @@
           <div class="user-email" id="sidebarUserEmail">...</div>
         </div>
       </div>
-      <button class="btn btn-ghost btn-sm btn-full" onclick="handleLogout()" style="margin-top:8px">
-        🚪 Sign Out
-      </button>
+      <div style="display:flex; gap:8px; margin-top:8px">
+        <button class="btn btn-ghost btn-sm" id="themeToggle" onclick="toggleTheme()" style="flex:1" title="Toggle Theme">
+          ☀️
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="handleLogout()" style="flex:3">
+          🚪 Sign Out
+        </button>
+      </div>
     </div>
   </aside>
 
-  <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
   <div class="app-main">
 
-    <!-- Topbar -->
     <header class="topbar">
       <div>
         <div class="topbar-title" id="topbarTitle">Dashboard</div>
@@ -164,30 +201,24 @@
       </div>
     </header>
 
-    <!-- Page content -->
     <div class="page-content">
 
-      <!-- Dashboard View -->
       <div id="view-dashboard" class="view">
         <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading dashboard...</div></div>
       </div>
 
-      <!-- Subscriptions View -->
       <div id="view-subscriptions" class="view hidden">
         <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading...</div></div>
       </div>
 
-      <!-- Free Trials View -->
       <div id="view-trials" class="view hidden">
         <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading...</div></div>
       </div>
 
-      <!-- Analytics View -->
       <div id="view-analytics" class="view hidden">
         <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading...</div></div>
       </div>
 
-      <!-- Catalog View -->
       <div id="view-catalog" class="view hidden">
         <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading...</div></div>
       </div>
@@ -197,9 +228,6 @@
 </div>
 
 
-<!-- ══════════════════════════════════════════════════════════════
-     MODAL
-══════════════════════════════════════════════════════════════ -->
 <div id="modalOverlay" class="modal-overlay hidden">
   <div class="modal">
     <div class="modal-header">
@@ -212,16 +240,10 @@
 </div>
 
 
-<!-- ══════════════════════════════════════════════════════════════
-     TOAST NOTIFICATIONS
-══════════════════════════════════════════════════════════════ -->
 <div id="toastContainer"></div>
 
 
-<!-- ══════════════════════════════════════════════════════════════
-     APP SCRIPT
-══════════════════════════════════════════════════════════════ -->
-<script src="js/app.js?v=2"></script>
+<script src="js/app.js?v=3"></script>
 
 </body>
 </html>
